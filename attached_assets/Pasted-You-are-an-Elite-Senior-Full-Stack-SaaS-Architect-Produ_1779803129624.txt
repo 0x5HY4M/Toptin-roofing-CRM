@@ -1,0 +1,437 @@
+You are an Elite Senior Full-Stack SaaS Architect, Product Designer, and Systems Engineer specializing in enterprise-grade, luxury, high-conversion CRM platforms for service-based businesses.
+
+Your task is to build a COMPLETE, PRODUCTION-READY Roofing CRM & Operations Platform for “Top Tin Roofing”.
+
+IMPORTANT:
+This is NOT a UI mockup.
+This is NOT a static dashboard.
+This must be a REAL full-stack SaaS application with actual backend architecture, persistent database integration, secure authentication, API integrations, and scalable production-ready code.
+
+The platform must feel comparable to modern premium SaaS products like JobNimbus, ServiceTitan, Monday.com, HubSpot, Linear, and Stripe Dashboard.
+
+==================================================
+1. CORE TECH STACK (MANDATORY)
+==================================================
+
+Frontend:
+- Next.js 15+ App Router
+- TypeScript
+- Tailwind CSS
+- Shadcn UI
+- Framer Motion
+- Lucide React
+- React Hook Form + Zod validation
+- TanStack Table
+- DND Kit for drag-and-drop
+
+Backend:
+- Supabase (REAL integration)
+OR
+- Node.js + Express + Prisma + PostgreSQL
+
+Database:
+- PostgreSQL schema fully implemented
+- Persistent data saving
+- Relational structure
+- Production-safe schema
+
+Authentication:
+- Secure login/signup
+- Role-based auth
+- Admin
+- Manager
+- Sales Rep
+- Crew Member
+
+Hosting/Deployment Ready:
+- Vercel frontend deployment ready
+- Supabase environment configuration
+- .env.example included
+- Production-ready folder architecture
+
+==================================================
+2. UI/UX & VISUAL DESIGN SYSTEM
+==================================================
+
+The design must look EXTREMELY PREMIUM, MODERN, and EXPENSIVE.
+
+Visual Inspiration:
+- Stripe Dashboard
+- Linear
+- Vercel
+- Arc Browser
+- Tesla Admin Systems
+
+Color System:
+- Background:
+  Deep Sapphire Black gradient
+  (#070A13 → #0F1322)
+
+Accent Colors:
+- Cyber Cyan
+- Neon Emerald
+- Royal Purple
+- Soft electric blue highlights
+
+UI Effects:
+- Layered glassmorphism
+- Backdrop blur
+- Luxury shadow depth
+- Soft glowing borders
+- Animated gradients
+- Smooth hover physics
+- Magnetic button effects
+- Premium loading skeletons
+- Micro-interactions everywhere
+
+Animations:
+- Zero-lag Framer Motion animations
+- Smooth page transitions
+- Interactive KPI hover tilt
+- Animated sidebar
+- Smooth charts
+- Premium modal transitions
+
+Responsiveness:
+- FULLY responsive
+- Mobile-first optimization
+- Tablet optimized
+- Desktop optimized
+- Touch interactions supported
+
+Typography:
+- Ultra clean SaaS typography
+- Perfect spacing hierarchy
+- Premium card layouts
+
+==================================================
+3. FULL REAL FUNCTIONALITY (NO MOCK DATA ONLY)
+==================================================
+
+ALL modules must be FULLY WORKING.
+
+==================================================
+4. AUTHENTICATION SYSTEM
+==================================================
+
+Implement REAL authentication:
+- Login
+- Signup
+- Forgot password
+- Email verification
+- Session persistence
+- Protected routes
+- JWT/session auth
+
+Roles:
+- Admin
+- Manager
+- Sales
+- Crew
+
+==================================================
+5. DATABASE & DATA PERSISTENCE
+==================================================
+
+Use REAL persistent storage.
+
+Create complete PostgreSQL schema for:
+
+- Users
+- Leads
+- Customers
+- Projects
+- Invoices
+- Estimates
+- Roofing Materials
+- Crew Members
+- Tasks
+- Notifications
+- Calendar Events
+- Activity Logs
+- Messages
+- Payments
+
+Generate:
+- Prisma schema
+OR
+- Supabase SQL schema
+
+Include:
+- Foreign keys
+- Relationships
+- Indexing
+- Timestamps
+- Proper validation
+
+==================================================
+6. LIVE LEADS CRM PIPELINE
+==================================================
+
+Create a FULLY FUNCTIONAL drag-and-drop CRM pipeline.
+
+Pipeline Stages:
+- New Request
+- Contacted
+- Inspection Scheduled
+- Quote Sent
+- Negotiation
+- In Progress
+- Completed
+- Lost
+
+Features:
+- Real-time updates
+- Drag/drop functionality
+- Persistent save to database
+- Search/filter/sort
+- Lead detail modal
+- Activity history
+- Notes system
+- File attachments
+- Assigned sales reps
+- Lead priority tags
+
+==================================================
+7. PROJECT MANAGEMENT SYSTEM
+==================================================
+
+Create a REAL roofing operations management system.
+
+Features:
+- Roofing project tracking
+- Progress stages
+- Crew assignment
+- Deadlines
+- Job status
+- Material tracking
+- Property address management
+- Inspection scheduling
+- Timeline view
+- Kanban + table views
+
+==================================================
+8. TEAM & CREW SCHEDULING
+==================================================
+
+Build a premium scheduling module.
+
+Features:
+- Calendar system
+- Drag-and-drop scheduling
+- Crew assignment
+- Daily job routes
+- Availability tracking
+- Timeline scheduler
+- Mobile-friendly crew dashboard
+
+==================================================
+9. ESTIMATE & INVOICE GENERATOR
+==================================================
+
+Create a REAL invoice/estimate system.
+
+Features:
+- Dynamic roofing estimate calculator
+- Material selection
+- Roof square footage calculations
+- Tax calculations
+- Discounts
+- PDF invoice generation
+- Download invoice
+- Print invoice
+- Email invoice
+
+Roofing Materials:
+- Asphalt Shingles
+- Metal Roofing
+- TPO
+- EPDM
+- Flashing
+- Underlayment
+
+==================================================
+10. PAYMENT SYSTEM
+==================================================
+
+Stripe-ready architecture.
+
+Features:
+- Payment tracking
+- Invoice status
+- Paid/unpaid dashboard
+- Transaction history
+
+Provide:
+- Placeholder Stripe integration hooks
+- Webhook structure
+- Payment database schema
+
+==================================================
+11. TWILIO & WHATSAPP API INTEGRATION
+==================================================
+
+Implement REAL communication architecture.
+
+Features:
+- Twilio SMS integration structure
+- WhatsApp API integration
+- Automated reminders
+- Lead follow-up messages
+- Estimate delivery notifications
+- Crew notifications
+
+Provide:
+- API service layer
+- Environment variable setup
+- Webhook handlers
+- Messaging queue structure
+
+==================================================
+12. EMAIL AUTOMATION SYSTEM
+==================================================
+
+Implement:
+- Email templates
+- Lead nurture flows
+- Estimate delivery emails
+- Appointment reminders
+- Follow-up automations
+
+Compatible with:
+- Resend
+- SendGrid
+- SMTP
+
+==================================================
+13. DASHBOARD ANALYTICS
+==================================================
+
+Build REAL analytics dashboards.
+
+KPIs:
+- Revenue
+- Conversion Rate
+- Lead Sources
+- Monthly Growth
+- Job Completion Rate
+- Team Performance
+
+Charts:
+- Interactive charts
+- Animated graphs
+- Revenue trends
+- Lead funnel visualization
+
+==================================================
+14. FILE & IMAGE MANAGEMENT
+==================================================
+
+Implement:
+- Image uploads
+- Roof inspection photos
+- PDF uploads
+- Attachment previews
+- Cloud storage hooks
+
+Compatible with:
+- Supabase Storage
+- AWS S3
+- Cloudinary
+
+==================================================
+15. REAL API ARCHITECTURE
+==================================================
+
+Create actual backend structure.
+
+Include:
+- API routes
+- Controllers
+- Services
+- Middleware
+- Validation
+- Error handling
+- Rate limiting
+- Secure headers
+- Logging system
+
+==================================================
+16. SECURITY (MANDATORY)
+==================================================
+
+Implement production-level security.
+
+Include:
+- Input sanitization
+- Zod validation
+- SQL injection prevention
+- Auth middleware
+- Environment variable protection
+- Secure API handling
+- Role-based permissions
+
+==================================================
+17. PERFORMANCE OPTIMIZATION
+==================================================
+
+Application must feel LIGHTNING FAST.
+
+Implement:
+- Lazy loading
+- Optimized rendering
+- Suspense boundaries
+- Memoization
+- Server components
+- Pagination
+- Efficient queries
+
+==================================================
+18. CODE QUALITY
+==================================================
+
+MANDATORY:
+- Clean architecture
+- Modular folder structure
+- Reusable components
+- Enterprise-grade code quality
+- Type safety everywhere
+- Comment important sections
+- Maintainable codebase
+
+==================================================
+19. DEMO DATA
+==================================================
+
+Populate the app with REALISTIC roofing company data.
+
+Include:
+- Realistic homeowner names
+- Roofing projects
+- Invoices
+- Estimates
+- Team schedules
+- Roofing materials
+- Revenue history
+
+==================================================
+20. FINAL OUTPUT REQUIREMENTS
+==================================================
+
+Generate:
+- Complete frontend
+- Complete backend
+- Database schema
+- API routes
+- Authentication
+- Dashboard pages
+- CRM modules
+- Invoice system
+- Twilio integration structure
+- Supabase integration
+- Environment setup
+- README setup guide
+
+The final result must feel like a REAL premium SaaS startup product worth $50,000+ in development value.
+
+The app should be so polished and interactive that roofing companies immediately believe it is a fully completed enterprise software platform ready for deployment.

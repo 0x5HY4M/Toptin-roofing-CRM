@@ -1,0 +1,3 @@
+- [Top Tin Roofing CRM Stack](top-tin-roofing-stack.md) — full-stack CRM: React+Vite, Express 5, PostgreSQL+Drizzle, Clerk auth, TanStack Query hooks
+- [Clerk Proxy Setup](clerk-proxy.md) — clerkMiddleware uses publishableKeyFromHost + getClerkProxyHost; proxyUrl from VITE_CLERK_PROXY_URL env var
+- [Numeric DB Fields Pattern](numeric-fields.md) — all money/decimal DB fields stored as `numeric` strings; routes must parse with parseFloat() before returning

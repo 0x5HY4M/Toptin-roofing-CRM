@@ -3,20 +3,42 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Top Tin Roofing CRM & Operations Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: leads
+    description: Lead management
+  - name: customers
+    description: Customer management
+  - name: projects
+    description: Project management
+  - name: estimates
+    description: Estimates
+  - name: invoices
+    description: Invoices
+  - name: crew
+    description: Crew members
+  - name: tasks
+    description: Tasks
+  - name: events
+    description: Calendar events
+  - name: materials
+    description: Roofing materials
+  - name: dashboard
+    description: Dashboard analytics
+  - name: activity
+    description: Activity logs
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +46,1351 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── LEADS ──────────────────────────────────────────────────────────────────
+  /leads:
+    get:
+      operationId: getLeads
+      tags: [leads]
+      summary: List all leads
+      parameters:
+        - name: stage
+          in: query
+          schema: { type: string }
+        - name: assignedTo
+          in: query
+          schema: { type: string }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of leads
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Lead" }
+    post:
+      operationId: createLead
+      tags: [leads]
+      summary: Create a lead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lead" }
+
+  /leads/{id}:
+    get:
+      operationId: getLead
+      tags: [leads]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Lead detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lead" }
+    patch:
+      operationId: updateLead
+      tags: [leads]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lead" }
+    delete:
+      operationId: deleteLead
+      tags: [leads]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /leads/{id}/stage:
+    patch:
+      operationId: updateLeadStage
+      tags: [leads]
+      summary: Move lead to a different pipeline stage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadStageUpdate" }
+      responses:
+        "200":
+          description: Stage updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lead" }
+
+  /leads/{id}/notes:
+    post:
+      operationId: addLeadNote
+      tags: [leads]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NoteInput" }
+      responses:
+        "201":
+          description: Note added
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Note" }
+
+  # ── CUSTOMERS ──────────────────────────────────────────────────────────────
+  /customers:
+    get:
+      operationId: getCustomers
+      tags: [customers]
+      parameters:
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Customer" }
+    post:
+      operationId: createCustomer
+      tags: [customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+
+  /customers/{id}:
+    get:
+      operationId: getCustomer
+      tags: [customers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Customer detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+    patch:
+      operationId: updateCustomer
+      tags: [customers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+    delete:
+      operationId: deleteCustomer
+      tags: [customers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  # ── PROJECTS ───────────────────────────────────────────────────────────────
+  /projects:
+    get:
+      operationId: getProjects
+      tags: [projects]
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: customerId
+          in: query
+          schema: { type: integer }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Project" }
+    post:
+      operationId: createProject
+      tags: [projects]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProjectInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Project" }
+
+  /projects/{id}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Project detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Project" }
+    patch:
+      operationId: updateProject
+      tags: [projects]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProjectUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Project" }
+    delete:
+      operationId: deleteProject
+      tags: [projects]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  # ── ESTIMATES ──────────────────────────────────────────────────────────────
+  /estimates:
+    get:
+      operationId: getEstimates
+      tags: [estimates]
+      parameters:
+        - name: customerId
+          in: query
+          schema: { type: integer }
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of estimates
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Estimate" }
+    post:
+      operationId: createEstimate
+      tags: [estimates]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EstimateInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Estimate" }
+
+  /estimates/{id}:
+    get:
+      operationId: getEstimate
+      tags: [estimates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Estimate detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Estimate" }
+    patch:
+      operationId: updateEstimate
+      tags: [estimates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EstimateUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Estimate" }
+    delete:
+      operationId: deleteEstimate
+      tags: [estimates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  # ── INVOICES ───────────────────────────────────────────────────────────────
+  /invoices:
+    get:
+      operationId: getInvoices
+      tags: [invoices]
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: customerId
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: List of invoices
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Invoice" }
+    post:
+      operationId: createInvoice
+      tags: [invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InvoiceInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+
+  /invoices/{id}:
+    get:
+      operationId: getInvoice
+      tags: [invoices]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Invoice detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+    patch:
+      operationId: updateInvoice
+      tags: [invoices]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InvoiceUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+    delete:
+      operationId: deleteInvoice
+      tags: [invoices]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  # ── CREW MEMBERS ───────────────────────────────────────────────────────────
+  /crew:
+    get:
+      operationId: getCrewMembers
+      tags: [crew]
+      responses:
+        "200":
+          description: List of crew members
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/CrewMember" }
+    post:
+      operationId: createCrewMember
+      tags: [crew]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CrewMemberInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CrewMember" }
+
+  /crew/{id}:
+    get:
+      operationId: getCrewMember
+      tags: [crew]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Crew member detail
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CrewMember" }
+    patch:
+      operationId: updateCrewMember
+      tags: [crew]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CrewMemberUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CrewMember" }
+    delete:
+      operationId: deleteCrewMember
+      tags: [crew]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  # ── TASKS ──────────────────────────────────────────────────────────────────
+  /tasks:
+    get:
+      operationId: getTasks
+      tags: [tasks]
+      parameters:
+        - name: projectId
+          in: query
+          schema: { type: integer }
+        - name: assignedTo
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Task" }
+    post:
+      operationId: createTask
+      tags: [tasks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TaskInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Task" }
+
+  /tasks/{id}:
+    patch:
+      operationId: updateTask
+      tags: [tasks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TaskUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Task" }
+    delete:
+      operationId: deleteTask
+      tags: [tasks]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  # ── CALENDAR EVENTS ────────────────────────────────────────────────────────
+  /events:
+    get:
+      operationId: getEvents
+      tags: [events]
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: crewId
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/CalendarEvent" }
+    post:
+      operationId: createEvent
+      tags: [events]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CalendarEventInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CalendarEvent" }
+
+  /events/{id}:
+    patch:
+      operationId: updateEvent
+      tags: [events]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CalendarEventUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CalendarEvent" }
+    delete:
+      operationId: deleteEvent
+      tags: [events]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  # ── MATERIALS ──────────────────────────────────────────────────────────────
+  /materials:
+    get:
+      operationId: getMaterials
+      tags: [materials]
+      responses:
+        "200":
+          description: List of roofing materials
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Material" }
+    post:
+      operationId: createMaterial
+      tags: [materials]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MaterialInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Material" }
+
+  /materials/{id}:
+    patch:
+      operationId: updateMaterial
+      tags: [materials]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MaterialUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Material" }
+    delete:
+      operationId: deleteMaterial
+      tags: [materials]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  # ── ACTIVITY LOGS ──────────────────────────────────────────────────────────
+  /activity:
+    get:
+      operationId: getActivityLogs
+      tags: [activity]
+      parameters:
+        - name: leadId
+          in: query
+          schema: { type: integer }
+        - name: projectId
+          in: query
+          schema: { type: integer }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: List of activity logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ActivityLog" }
+
+  # ── DASHBOARD ──────────────────────────────────────────────────────────────
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get high-level KPI summary
+      responses:
+        "200":
+          description: Dashboard summary stats
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardSummary" }
+
+  /dashboard/revenue:
+    get:
+      operationId: getRevenueTimeline
+      tags: [dashboard]
+      summary: Monthly revenue data for chart
+      responses:
+        "200":
+          description: Revenue timeline
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/RevenueDataPoint" }
+
+  /dashboard/lead-funnel:
+    get:
+      operationId: getLeadFunnel
+      tags: [dashboard]
+      summary: Lead counts by pipeline stage
+      responses:
+        "200":
+          description: Lead funnel data
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/FunnelStage" }
+
+  /dashboard/recent-activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Recent activity feed for dashboard
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/ActivityLog" }
+
+  /dashboard/project-status:
+    get:
+      operationId: getProjectStatusBreakdown
+      tags: [dashboard]
+      summary: Project count by status
+      responses:
+        "200":
+          description: Project status breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/StatusCount" }
+
 components:
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
+        status: { type: string }
+      required: [status]
 
+    # ── LEAD ────────────────────────────────────────────────────────────────
+    Lead:
+      type: object
+      required: [id, name, email, phone, stage, priority, source, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        address: { type: ["string", "null"] }
+        roofType: { type: ["string", "null"] }
+        squareFootage: { type: ["number", "null"] }
+        stage: { type: string }
+        priority: { type: string }
+        source: { type: string }
+        assignedTo: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        estimatedValue: { type: ["number", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    LeadInput:
+      type: object
+      required: [name, email, phone, stage, priority, source]
+      properties:
+        name: { type: string, minLength: 1 }
+        email: { type: string }
+        phone: { type: string }
+        address: { type: string }
+        roofType: { type: string }
+        squareFootage: { type: number }
+        stage: { type: string }
+        priority: { type: string }
+        source: { type: string }
+        assignedTo: { type: string }
+        notes: { type: string }
+        estimatedValue: { type: number }
+
+    LeadUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        address: { type: string }
+        roofType: { type: string }
+        squareFootage: { type: number }
+        stage: { type: string }
+        priority: { type: string }
+        source: { type: string }
+        assignedTo: { type: string }
+        notes: { type: string }
+        estimatedValue: { type: number }
+
+    LeadStageUpdate:
+      type: object
+      required: [stage]
+      properties:
+        stage: { type: string }
+
+    NoteInput:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, minLength: 1 }
+        author: { type: string }
+
+    Note:
+      type: object
+      required: [id, content, createdAt]
+      properties:
+        id: { type: integer }
+        content: { type: string }
+        author: { type: ["string", "null"] }
+        leadId: { type: ["integer", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    # ── CUSTOMER ────────────────────────────────────────────────────────────
+    Customer:
+      type: object
+      required: [id, name, email, phone, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        address: { type: ["string", "null"] }
+        city: { type: ["string", "null"] }
+        state: { type: ["string", "null"] }
+        zipCode: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    CustomerInput:
+      type: object
+      required: [name, email, phone]
+      properties:
+        name: { type: string, minLength: 1 }
+        email: { type: string }
+        phone: { type: string }
+        address: { type: string }
+        city: { type: string }
+        state: { type: string }
+        zipCode: { type: string }
+        notes: { type: string }
+
+    CustomerUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        address: { type: string }
+        city: { type: string }
+        state: { type: string }
+        zipCode: { type: string }
+        notes: { type: string }
+
+    # ── PROJECT ─────────────────────────────────────────────────────────────
+    Project:
+      type: object
+      required: [id, name, customerId, status, roofType, address, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        customerId: { type: integer }
+        customerName: { type: ["string", "null"] }
+        status: { type: string }
+        roofType: { type: string }
+        address: { type: string }
+        squareFootage: { type: ["number", "null"] }
+        startDate: { type: ["string", "null"], format: date }
+        endDate: { type: ["string", "null"], format: date }
+        assignedCrewId: { type: ["integer", "null"] }
+        assignedCrewName: { type: ["string", "null"] }
+        contractValue: { type: ["number", "null"] }
+        materialCost: { type: ["number", "null"] }
+        laborCost: { type: ["number", "null"] }
+        notes: { type: ["string", "null"] }
+        progressPercent: { type: ["integer", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    ProjectInput:
+      type: object
+      required: [name, customerId, status, roofType, address]
+      properties:
+        name: { type: string, minLength: 1 }
+        customerId: { type: integer }
+        status: { type: string }
+        roofType: { type: string }
+        address: { type: string }
+        squareFootage: { type: number }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        assignedCrewId: { type: integer }
+        contractValue: { type: number }
+        materialCost: { type: number }
+        laborCost: { type: number }
+        notes: { type: string }
+        progressPercent: { type: integer }
+
+    ProjectUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        status: { type: string }
+        roofType: { type: string }
+        address: { type: string }
+        squareFootage: { type: number }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        assignedCrewId: { type: integer }
+        contractValue: { type: number }
+        materialCost: { type: number }
+        laborCost: { type: number }
+        notes: { type: string }
+        progressPercent: { type: integer }
+
+    # ── ESTIMATE ────────────────────────────────────────────────────────────
+    Estimate:
+      type: object
+      required: [id, customerId, status, totalAmount, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        customerId: { type: integer }
+        customerName: { type: ["string", "null"] }
+        projectId: { type: ["integer", "null"] }
+        status: { type: string }
+        roofType: { type: string }
+        squareFootage: { type: ["number", "null"] }
+        materialCost: { type: ["number", "null"] }
+        laborCost: { type: ["number", "null"] }
+        taxRate: { type: ["number", "null"] }
+        discountAmount: { type: ["number", "null"] }
+        totalAmount: { type: number }
+        notes: { type: ["string", "null"] }
+        validUntil: { type: ["string", "null"], format: date }
+        lineItems: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    EstimateInput:
+      type: object
+      required: [customerId, status, totalAmount]
+      properties:
+        customerId: { type: integer }
+        projectId: { type: integer }
+        status: { type: string }
+        roofType: { type: string }
+        squareFootage: { type: number }
+        materialCost: { type: number }
+        laborCost: { type: number }
+        taxRate: { type: number }
+        discountAmount: { type: number }
+        totalAmount: { type: number }
+        notes: { type: string }
+        validUntil: { type: string, format: date }
+        lineItems: { type: string }
+
+    EstimateUpdate:
+      type: object
+      properties:
+        status: { type: string }
+        roofType: { type: string }
+        squareFootage: { type: number }
+        materialCost: { type: number }
+        laborCost: { type: number }
+        taxRate: { type: number }
+        discountAmount: { type: number }
+        totalAmount: { type: number }
+        notes: { type: string }
+        validUntil: { type: string, format: date }
+        lineItems: { type: string }
+
+    # ── INVOICE ─────────────────────────────────────────────────────────────
+    Invoice:
+      type: object
+      required: [id, customerId, status, totalAmount, dueDate, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        invoiceNumber: { type: string }
+        customerId: { type: integer }
+        customerName: { type: ["string", "null"] }
+        projectId: { type: ["integer", "null"] }
+        status: { type: string }
+        subtotal: { type: ["number", "null"] }
+        taxAmount: { type: ["number", "null"] }
+        discountAmount: { type: ["number", "null"] }
+        totalAmount: { type: number }
+        paidAmount: { type: ["number", "null"] }
+        dueDate: { type: string, format: date }
+        paidAt: { type: ["string", "null"], format: date }
+        notes: { type: ["string", "null"] }
+        lineItems: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    InvoiceInput:
+      type: object
+      required: [customerId, status, totalAmount, dueDate]
+      properties:
+        customerId: { type: integer }
+        projectId: { type: integer }
+        status: { type: string }
+        subtotal: { type: number }
+        taxAmount: { type: number }
+        discountAmount: { type: number }
+        totalAmount: { type: number }
+        paidAmount: { type: number }
+        dueDate: { type: string, format: date }
+        notes: { type: string }
+        lineItems: { type: string }
+
+    InvoiceUpdate:
+      type: object
+      properties:
+        status: { type: string }
+        subtotal: { type: number }
+        taxAmount: { type: number }
+        discountAmount: { type: number }
+        totalAmount: { type: number }
+        paidAmount: { type: number }
+        dueDate: { type: string, format: date }
+        paidAt: { type: string, format: date }
+        notes: { type: string }
+        lineItems: { type: string }
+
+    # ── CREW MEMBER ─────────────────────────────────────────────────────────
+    CrewMember:
+      type: object
+      required: [id, name, role, phone, status, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        role: { type: string }
+        phone: { type: string }
+        email: { type: ["string", "null"] }
+        status: { type: string }
+        specialties: { type: ["string", "null"] }
+        hourlyRate: { type: ["number", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    CrewMemberInput:
+      type: object
+      required: [name, role, phone, status]
+      properties:
+        name: { type: string, minLength: 1 }
+        role: { type: string }
+        phone: { type: string }
+        email: { type: string }
+        status: { type: string }
+        specialties: { type: string }
+        hourlyRate: { type: number }
+
+    CrewMemberUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        role: { type: string }
+        phone: { type: string }
+        email: { type: string }
+        status: { type: string }
+        specialties: { type: string }
+        hourlyRate: { type: number }
+
+    # ── TASK ────────────────────────────────────────────────────────────────
+    Task:
+      type: object
+      required: [id, title, status, priority, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: ["string", "null"] }
+        status: { type: string }
+        priority: { type: string }
+        projectId: { type: ["integer", "null"] }
+        projectName: { type: ["string", "null"] }
+        assignedTo: { type: ["string", "null"] }
+        dueDate: { type: ["string", "null"], format: date }
+        completedAt: { type: ["string", "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    TaskInput:
+      type: object
+      required: [title, status, priority]
+      properties:
+        title: { type: string, minLength: 1 }
+        description: { type: string }
+        status: { type: string }
+        priority: { type: string }
+        projectId: { type: integer }
+        assignedTo: { type: string }
+        dueDate: { type: string, format: date }
+
+    TaskUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string }
+        status: { type: string }
+        priority: { type: string }
+        projectId: { type: integer }
+        assignedTo: { type: string }
+        dueDate: { type: string, format: date }
+        completedAt: { type: string, format: date-time }
+
+    # ── CALENDAR EVENT ──────────────────────────────────────────────────────
+    CalendarEvent:
+      type: object
+      required: [id, title, startTime, endTime, type, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: ["string", "null"] }
+        type: { type: string }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+        projectId: { type: ["integer", "null"] }
+        projectName: { type: ["string", "null"] }
+        crewId: { type: ["integer", "null"] }
+        crewName: { type: ["string", "null"] }
+        customerId: { type: ["integer", "null"] }
+        customerName: { type: ["string", "null"] }
+        location: { type: ["string", "null"] }
+        status: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    CalendarEventInput:
+      type: object
+      required: [title, startTime, endTime, type, status]
+      properties:
+        title: { type: string, minLength: 1 }
+        description: { type: string }
+        type: { type: string }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+        projectId: { type: integer }
+        crewId: { type: integer }
+        customerId: { type: integer }
+        location: { type: string }
+        status: { type: string }
+
+    CalendarEventUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string }
+        type: { type: string }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+        projectId: { type: integer }
+        crewId: { type: integer }
+        customerId: { type: integer }
+        location: { type: string }
+        status: { type: string }
+
+    # ── MATERIAL ────────────────────────────────────────────────────────────
+    Material:
+      type: object
+      required: [id, name, category, unit, pricePerUnit, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        category: { type: string }
+        description: { type: ["string", "null"] }
+        unit: { type: string }
+        pricePerUnit: { type: number }
+        stockQuantity: { type: ["integer", "null"] }
+        supplier: { type: ["string", "null"] }
+        sku: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    MaterialInput:
+      type: object
+      required: [name, category, unit, pricePerUnit]
+      properties:
+        name: { type: string, minLength: 1 }
+        category: { type: string }
+        description: { type: string }
+        unit: { type: string }
+        pricePerUnit: { type: number }
+        stockQuantity: { type: integer }
+        supplier: { type: string }
+        sku: { type: string }
+
+    MaterialUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        category: { type: string }
+        description: { type: string }
+        unit: { type: string }
+        pricePerUnit: { type: number }
+        stockQuantity: { type: integer }
+        supplier: { type: string }
+        sku: { type: string }
+
+    # ── ACTIVITY LOG ────────────────────────────────────────────────────────
+    ActivityLog:
+      type: object
+      required: [id, action, entity, createdAt]
+      properties:
+        id: { type: integer }
+        action: { type: string }
+        entity: { type: string }
+        entityId: { type: ["integer", "null"] }
+        entityName: { type: ["string", "null"] }
+        description: { type: ["string", "null"] }
+        actor: { type: ["string", "null"] }
+        leadId: { type: ["integer", "null"] }
+        projectId: { type: ["integer", "null"] }
+        createdAt: { type: string, format: date-time }
+
+    # ── DASHBOARD ───────────────────────────────────────────────────────────
+    DashboardSummary:
+      type: object
+      required: [totalLeads, activeProjects, monthlyRevenue, totalCustomers, openInvoices, pendingTasks, conversionRate, revenueChange]
+      properties:
+        totalLeads: { type: integer }
+        activeProjects: { type: integer }
+        monthlyRevenue: { type: number }
+        totalCustomers: { type: integer }
+        openInvoices: { type: integer }
+        openInvoiceAmount: { type: number }
+        pendingTasks: { type: integer }
+        conversionRate: { type: number }
+        revenueChange: { type: number }
+        leadsChange: { type: number }
+        projectsChange: { type: number }
+
+    RevenueDataPoint:
+      type: object
+      required: [month, revenue, invoiceCount]
+      properties:
+        month: { type: string }
+        revenue: { type: number }
+        invoiceCount: { type: integer }
+        projectCount: { type: integer }
+
+    FunnelStage:
+      type: object
+      required: [stage, count, value]
+      properties:
+        stage: { type: string }
+        count: { type: integer }
+        value: { type: number }
+
+    StatusCount:
+      type: object
+      required: [status, count]
+      properties:
+        status: { type: string }
+        count: { type: integer }
