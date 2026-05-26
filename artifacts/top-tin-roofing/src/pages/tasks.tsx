@@ -80,25 +80,30 @@ export default function Tasks() {
   }
 
   const filtered = (tasks ?? []).filter(t => filter === "all" || t.status === filter);
-  const counts = { all: tasks?.length ?? 0, todo: tasks?.filter(t => t.status === "todo").length ?? 0, in_progress: tasks?.filter(t => t.status === "in_progress").length ?? 0, done: tasks?.filter(t => t.status === "done").length ?? 0 };
+  const counts = {
+    all: tasks?.length ?? 0,
+    todo: tasks?.filter(t => t.status === "todo").length ?? 0,
+    in_progress: tasks?.filter(t => t.status === "in_progress").length ?? 0,
+    done: tasks?.filter(t => t.status === "done").length ?? 0,
+  };
 
   return (
     <AppShell>
-      <div className="flex flex-col space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground glow-text mb-1">Tasks</h1>
-            <p className="text-muted-foreground">Track work items and action items across projects.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground glow-text">Tasks</h1>
+            <p className="text-sm text-muted-foreground">Track work items and action items across projects.</p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30">
+              <Button className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 self-start sm:self-auto">
                 <Plus className="h-4 w-4 mr-2" /> New Task
               </Button>
             </DialogTrigger>
             <DialogContent className="glass border-white/10">
               <DialogHeader><DialogTitle className="text-foreground">Create Task</DialogTitle></DialogHeader>
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
                 <div>
                   <Label className="text-xs text-muted-foreground">Title</Label>
                   <Input className="bg-muted/30 border-white/10 mt-1" value={form.title} onChange={e => set("title", e.target.value)} placeholder="Task title..." />
@@ -145,9 +150,21 @@ export default function Tasks() {
           </Dialog>
         </div>
 
-        <div className="flex gap-2">
+        {/* Filter pills — horizontal scroll on mobile */}
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
           {(["all", "todo", "in_progress", "done"] as const).map(f => (
-            <Button key={f} variant={filter === f ? "default" : "ghost"} size="sm" className={cn("text-xs", filter === f ? "bg-primary/20 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground")} onClick={() => setFilter(f)}>
+            <Button
+              key={f}
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "text-xs flex-shrink-0",
+                filter === f
+                  ? "bg-primary/20 text-primary border border-primary/30"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              onClick={() => setFilter(f)}
+            >
               {f === "all" ? "All" : f === "in_progress" ? "In Progress" : f === "todo" ? "To Do" : "Done"}
               <span className="ml-1.5 opacity-60">({counts[f]})</span>
             </Button>
@@ -157,7 +174,7 @@ export default function Tasks() {
         {isLoading ? (
           <div className="space-y-2">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-16 bg-white/5 rounded-xl" />)}</div>
         ) : !filtered.length ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
             <CheckSquare className="h-12 w-12 text-muted-foreground mb-4 opacity-30" />
             <h3 className="text-lg font-medium text-muted-foreground mb-1">No tasks {filter !== "all" ? `with status "${filter}"` : "yet"}</h3>
             {filter === "all" && <Button onClick={() => setOpen(true)} className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 mt-3"><Plus className="h-4 w-4 mr-2" />Create Task</Button>}
@@ -165,27 +182,39 @@ export default function Tasks() {
         ) : (
           <div className="space-y-2">
             {filtered.map(task => (
-              <Card key={task.id} className={cn("glass hover:border-primary/30 transition-colors group", task.status === "done" && "opacity-50")}>
-                <CardContent className="p-4 flex items-center gap-3">
-                  <Checkbox
-                    checked={task.status === "done"}
-                    onCheckedChange={() => handleToggle(task.id, task.status)}
-                    className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className={cn("text-sm font-medium text-foreground", task.status === "done" && "line-through text-muted-foreground")}>{task.title}</p>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-                      {task.projectName && <span>{task.projectName}</span>}
-                      {task.assignedTo && <span>· {task.assignedTo}</span>}
-                      {task.dueDate && <span className="flex items-center gap-1"><CalendarDays className="h-3 w-3" />{format(new Date(task.dueDate), "MMM d")}</span>}
+              <Card key={task.id} className={cn("glass hover:border-primary/30 transition-colors", task.status === "done" && "opacity-50")}>
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      checked={task.status === "done"}
+                      onCheckedChange={() => handleToggle(task.id, task.status)}
+                      className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary mt-0.5 flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className={cn("text-sm font-medium text-foreground", task.status === "done" && "line-through text-muted-foreground")}>{task.title}</p>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mt-0.5">
+                        {task.projectName && <span className="truncate max-w-[120px]">{task.projectName}</span>}
+                        {task.assignedTo && <span className="truncate">{task.assignedTo}</span>}
+                        {task.dueDate && (
+                          <span className="flex items-center gap-1 flex-shrink-0">
+                            <CalendarDays className="h-3 w-3" />
+                            {format(new Date(task.dueDate), "MMM d")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", PRIORITY_STYLES[task.priority] ?? "bg-muted text-muted-foreground")}>
+                        {task.priority}
+                      </span>
+                      <button
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        onClick={() => handleDelete(task.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   </div>
-                  <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0", PRIORITY_STYLES[task.priority] ?? "bg-muted text-muted-foreground")}>
-                    {task.priority}
-                  </span>
-                  <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 h-7 w-7 text-destructive/70 hover:text-destructive hover:bg-destructive/10 flex-shrink-0" onClick={() => handleDelete(task.id)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
                 </CardContent>
               </Card>
             ))}

@@ -8,8 +8,7 @@ import {
   getGetEstimatesQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, FileText, Trash2, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const STATUS_COLORS: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
@@ -53,7 +53,7 @@ function EstimateCalculator({ onSubmit, customers }: any) {
   function set(k: string, v: string) { setForm(f => ({ ...f, [k]: v })); }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2">
           <Label className="text-xs text-muted-foreground">Customer</Label>
@@ -86,11 +86,11 @@ function EstimateCalculator({ onSubmit, customers }: any) {
           <Input className="bg-muted/30 border-white/10 mt-1" type="number" value={form.squareFootage} onChange={e => set("squareFootage", e.target.value)} placeholder="2400" />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Material Cost ($)</Label>
+          <Label className="text-xs text-muted-foreground">Material ($)</Label>
           <Input className="bg-muted/30 border-white/10 mt-1" type="number" value={form.materialCost} onChange={e => set("materialCost", e.target.value)} placeholder="0.00" />
         </div>
         <div>
-          <Label className="text-xs text-muted-foreground">Labor Cost ($)</Label>
+          <Label className="text-xs text-muted-foreground">Labor ($)</Label>
           <Input className="bg-muted/30 border-white/10 mt-1" type="number" value={form.laborCost} onChange={e => set("laborCost", e.target.value)} placeholder="0.00" />
         </div>
         <div>
@@ -169,15 +169,15 @@ export default function Estimates() {
 
   return (
     <AppShell>
-      <div className="flex flex-col space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground glow-text mb-1">Estimates</h1>
-            <p className="text-muted-foreground">Create and manage project estimates.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground glow-text">Estimates</h1>
+            <p className="text-sm text-muted-foreground">Create and manage project estimates.</p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30">
+              <Button className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 self-start sm:self-auto">
                 <Plus className="h-4 w-4 mr-2" /> New Estimate
               </Button>
             </DialogTrigger>
@@ -195,7 +195,7 @@ export default function Estimates() {
             {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-20 w-full bg-white/5 rounded-xl" />)}
           </div>
         ) : !estimates?.length ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
             <FileText className="h-12 w-12 text-muted-foreground mb-4 opacity-30" />
             <h3 className="text-lg font-medium text-muted-foreground mb-1">No estimates yet</h3>
             <p className="text-sm text-muted-foreground/60 mb-4">Create your first estimate to get started.</p>
@@ -206,37 +206,39 @@ export default function Estimates() {
         ) : (
           <div className="space-y-3">
             {estimates.map(est => (
-              <Card key={est.id} className="glass hover:border-primary/30 transition-colors group">
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <FileText className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">{est.customerName ?? `Customer #${est.customerId}`}</p>
-                        <p className="text-xs text-muted-foreground">{est.roofType} · {est.squareFootage ? `${est.squareFootage.toLocaleString()} sq ft` : "N/A"}</p>
-                      </div>
+              <Card key={est.id} className="glass hover:border-primary/30 transition-colors">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <FileText className="h-4 w-4 text-primary" />
                     </div>
-                    <div className="flex items-center gap-6">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[est.status] ?? "bg-muted text-muted-foreground"}`}>
-                        {est.status}
-                      </span>
-                      {est.validUntil && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <CalendarDays className="h-3 w-3" />
-                          {format(new Date(est.validUntil), "MMM d, yyyy")}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-foreground text-sm truncate">{est.customerName ?? `Customer #${est.customerId}`}</p>
+                          <p className="text-xs text-muted-foreground truncate">{est.roofType} {est.squareFootage ? `· ${est.squareFootage.toLocaleString()} sq ft` : ""}</p>
                         </div>
-                      )}
-                      <span className="text-lg font-bold text-primary">${(est.totalAmount ?? 0).toLocaleString()}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="opacity-0 group-hover:opacity-100 text-destructive/70 hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => handleDelete(est.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0", STATUS_COLORS[est.status] ?? "bg-muted text-muted-foreground")}>
+                          {est.status}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between mt-2">
+                        {est.validUntil ? (
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <CalendarDays className="h-3 w-3" />
+                            {format(new Date(est.validUntil), "MMM d, yyyy")}
+                          </div>
+                        ) : <div />}
+                        <div className="flex items-center gap-2">
+                          <span className="text-base font-bold text-primary">${(est.totalAmount ?? 0).toLocaleString()}</span>
+                          <button
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                            onClick={() => handleDelete(est.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

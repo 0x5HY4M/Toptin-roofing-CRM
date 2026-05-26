@@ -8,6 +8,7 @@ import { publishableKeyFromHost } from "@clerk/react/internal";
 import { shadcn } from "@clerk/themes";
 import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
+import { CommandPaletteProvider } from "@/components/CommandPalette";
 
 // Pages
 import Dashboard from "@/pages/dashboard";
@@ -32,7 +33,6 @@ const clerkPubKey = publishableKeyFromHost(
 );
 
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
-
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 function stripBase(path: string): string {
@@ -41,9 +41,7 @@ function stripBase(path: string): string {
     : path;
 }
 
-if (!clerkPubKey) {
-  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
-}
+if (!clerkPubKey) throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 
 const clerkAppearance = {
   theme: shadcn,
@@ -63,14 +61,14 @@ const clerkAppearance = {
 
 function AuthPage({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-8">
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-[20%] left-[20%] w-[30%] h-[30%] rounded-full bg-primary/20 blur-[120px]" />
         <div className="absolute bottom-[10%] right-[15%] w-[25%] h-[25%] rounded-full bg-secondary/10 blur-[120px]" />
       </div>
-      <div className="z-10 w-full flex flex-col items-center gap-8">
+      <div className="z-10 w-full flex flex-col items-center gap-6 sm:gap-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
             TOP TIN ROOFING
           </h1>
           <p className="text-muted-foreground text-sm">Elite Command Center</p>
@@ -148,26 +146,28 @@ function AppRouter() {
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
-        <TooltipProvider>
-          <Switch>
-            <Route path="/" component={HomeRedirect} />
-            <Route path="/sign-in/*?" component={SignInPage} />
-            <Route path="/sign-up/*?" component={SignUpPage} />
-            <Route path="/dashboard"><ProtectedRoute component={Dashboard} /></Route>
-            <Route path="/leads"><ProtectedRoute component={Leads} /></Route>
-            <Route path="/customers"><ProtectedRoute component={Customers} /></Route>
-            <Route path="/projects"><ProtectedRoute component={Projects} /></Route>
-            <Route path="/estimates"><ProtectedRoute component={Estimates} /></Route>
-            <Route path="/invoices"><ProtectedRoute component={Invoices} /></Route>
-            <Route path="/crew"><ProtectedRoute component={Crew} /></Route>
-            <Route path="/schedule"><ProtectedRoute component={Schedule} /></Route>
-            <Route path="/tasks"><ProtectedRoute component={Tasks} /></Route>
-            <Route path="/materials"><ProtectedRoute component={Materials} /></Route>
-            <Route path="/settings"><ProtectedRoute component={SettingsPage} /></Route>
-            <Route component={NotFound} />
-          </Switch>
-          <Toaster richColors position="top-right" />
-        </TooltipProvider>
+        <CommandPaletteProvider>
+          <TooltipProvider>
+            <Switch>
+              <Route path="/" component={HomeRedirect} />
+              <Route path="/sign-in/*?" component={SignInPage} />
+              <Route path="/sign-up/*?" component={SignUpPage} />
+              <Route path="/dashboard"><ProtectedRoute component={Dashboard} /></Route>
+              <Route path="/leads"><ProtectedRoute component={Leads} /></Route>
+              <Route path="/customers"><ProtectedRoute component={Customers} /></Route>
+              <Route path="/projects"><ProtectedRoute component={Projects} /></Route>
+              <Route path="/estimates"><ProtectedRoute component={Estimates} /></Route>
+              <Route path="/invoices"><ProtectedRoute component={Invoices} /></Route>
+              <Route path="/crew"><ProtectedRoute component={Crew} /></Route>
+              <Route path="/schedule"><ProtectedRoute component={Schedule} /></Route>
+              <Route path="/tasks"><ProtectedRoute component={Tasks} /></Route>
+              <Route path="/materials"><ProtectedRoute component={Materials} /></Route>
+              <Route path="/settings"><ProtectedRoute component={SettingsPage} /></Route>
+              <Route component={NotFound} />
+            </Switch>
+            <Toaster richColors position="top-right" />
+          </TooltipProvider>
+        </CommandPaletteProvider>
       </QueryClientProvider>
     </ClerkProvider>
   );

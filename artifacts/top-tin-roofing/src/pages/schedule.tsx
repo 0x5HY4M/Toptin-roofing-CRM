@@ -4,7 +4,6 @@ import {
   useGetEvents,
   useGetProjects,
   useGetCrewMembers,
-  useGetCustomers,
   useCreateEvent,
   useDeleteEvent,
   getGetEventsQueryKey,
@@ -47,8 +46,6 @@ export default function Schedule() {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
-
-  // Pad to start on Monday
   const startDay = (monthStart.getDay() + 6) % 7;
 
   async function handleCreate() {
@@ -85,23 +82,26 @@ export default function Schedule() {
     return (events ?? []).filter(e => isSameDay(new Date(e.startTime), day));
   }
 
+  // Day labels: Mon-Fri full, Sat/Sun abbreviated for very small screens
+  const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
   return (
     <AppShell>
-      <div className="flex flex-col space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground glow-text mb-1">Schedule</h1>
-            <p className="text-muted-foreground">Calendar of inspections, meetings, and project milestones.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground glow-text">Schedule</h1>
+            <p className="text-sm text-muted-foreground">Calendar of inspections, meetings, and milestones.</p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30">
+              <Button className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 self-start sm:self-auto">
                 <Plus className="h-4 w-4 mr-2" /> Add Event
               </Button>
             </DialogTrigger>
             <DialogContent className="glass border-white/10">
               <DialogHeader><DialogTitle className="text-foreground">Create Event</DialogTitle></DialogHeader>
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
                 <div>
                   <Label className="text-xs text-muted-foreground">Title</Label>
                   <Input className="bg-muted/30 border-white/10 mt-1" value={form.title} onChange={e => set("title", e.target.value)} placeholder="Roof inspection at..." />
@@ -159,11 +159,11 @@ export default function Schedule() {
           </Dialog>
         </div>
 
-        <Card className="glass">
-          <CardHeader className="pb-3">
+        <Card className="glass overflow-hidden">
+          <CardHeader className="pb-3 pt-4 px-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg text-foreground">{format(currentMonth, "MMMM yyyy")}</CardTitle>
-              <div className="flex gap-2">
+              <CardTitle className="text-base sm:text-lg text-foreground">{format(currentMonth, "MMMM yyyy")}</CardTitle>
+              <div className="flex gap-1">
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -173,29 +173,53 @@ export default function Schedule() {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-7 mb-2">
-              {["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d => (
-                <div key={d} className="text-center text-xs text-muted-foreground py-2 font-medium">{d}</div>
+          <CardContent className="px-2 sm:px-4 pb-4">
+            {/* Day headers */}
+            <div className="grid grid-cols-7 mb-1">
+              {dayLabels.map(d => (
+                <div key={d} className="text-center text-[10px] sm:text-xs text-muted-foreground py-1.5 font-medium">{d}</div>
               ))}
             </div>
-            <div className="grid grid-cols-7 gap-1">
+            {/* Calendar grid */}
+            <div className="grid grid-cols-7 gap-0.5">
               {[...Array(startDay)].map((_, i) => <div key={`pad-${i}`} />)}
               {days.map(day => {
                 const dayEvents = eventsOnDay(day);
                 const isToday = isSameDay(day, new Date());
                 return (
-                  <div key={day.toString()} className={cn("min-h-[80px] rounded-xl p-1.5 transition-colors", isToday ? "bg-primary/10 border border-primary/20" : "hover:bg-white/3 border border-transparent")}>
-                    <div className={cn("text-xs font-medium mb-1", isToday ? "text-primary" : isSameMonth(day, currentMonth) ? "text-foreground" : "text-muted-foreground/30")}>
+                  <div
+                    key={day.toString()}
+                    className={cn(
+                      "min-h-[52px] sm:min-h-[72px] rounded-lg p-1 transition-colors",
+                      isToday ? "bg-primary/10 border border-primary/20" : "hover:bg-white/3 border border-transparent"
+                    )}
+                  >
+                    <div className={cn(
+                      "text-[10px] sm:text-xs font-medium mb-0.5",
+                      isToday ? "text-primary" : isSameMonth(day, currentMonth) ? "text-foreground" : "text-muted-foreground/30"
+                    )}>
                       {format(day, "d")}
                     </div>
                     <div className="space-y-0.5">
-                      {dayEvents.slice(0, 3).map(ev => (
-                        <div key={ev.id} className={cn("px-1 py-0.5 rounded text-[10px] truncate border", EVENT_COLORS[ev.type] ?? EVENT_COLORS.other)}>
+                      {dayEvents.slice(0, 2).map(ev => (
+                        <div
+                          key={ev.id}
+                          className={cn("px-0.5 py-0.5 rounded text-[8px] sm:text-[10px] truncate border hidden sm:block", EVENT_COLORS[ev.type] ?? EVENT_COLORS.other)}
+                        >
                           {ev.title}
                         </div>
                       ))}
-                      {dayEvents.length > 3 && <div className="text-[10px] text-muted-foreground pl-1">+{dayEvents.length - 3} more</div>}
+                      {/* Mobile: just a dot indicator */}
+                      {dayEvents.length > 0 && (
+                        <div className="sm:hidden flex gap-0.5 flex-wrap mt-0.5">
+                          {dayEvents.slice(0, 3).map(ev => (
+                            <div key={ev.id} className={cn("w-1.5 h-1.5 rounded-full", EVENT_COLORS[ev.type]?.split(" ")[0] ?? "bg-muted")} />
+                          ))}
+                        </div>
+                      )}
+                      {dayEvents.length > 2 && (
+                        <div className="text-[9px] sm:text-[10px] text-muted-foreground pl-0.5 hidden sm:block">+{dayEvents.length - 2}</div>
+                      )}
                     </div>
                   </div>
                 );
@@ -205,31 +229,39 @@ export default function Schedule() {
         </Card>
 
         <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Upcoming Events</h2>
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Upcoming Events</h2>
           {isLoading ? (
             <div className="space-y-2">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-16 bg-white/5 rounded-xl" />)}</div>
           ) : (
             <div className="space-y-2">
-              {(events ?? []).sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+              {(events ?? [])
+                .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
                 .filter(e => new Date(e.startTime) >= new Date())
                 .slice(0, 10)
                 .map(ev => (
-                  <Card key={ev.id} className="glass hover:border-primary/30 transition-colors group">
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={cn("w-2 h-8 rounded-full", EVENT_COLORS[ev.type]?.split(" ")[0] ?? "bg-muted")} />
-                        <div>
-                          <p className="font-medium text-sm text-foreground">{ev.title}</p>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Clock className="h-3 w-3" />
-                            {format(new Date(ev.startTime), "MMM d, yyyy 'at' h:mm a")}
-                            {ev.location && ` · ${ev.location}`}
+                  <Card key={ev.id} className="glass hover:border-primary/30 transition-colors">
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-3 min-w-0">
+                          <div className={cn("w-1.5 h-8 rounded-full flex-shrink-0 mt-0.5", EVENT_COLORS[ev.type]?.split(" ")[0] ?? "bg-muted")} />
+                          <div className="min-w-0">
+                            <p className="font-medium text-sm text-foreground truncate">{ev.title}</p>
+                            <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground mt-0.5">
+                              <span className="flex items-center gap-1 flex-shrink-0">
+                                <Clock className="h-3 w-3" />
+                                {format(new Date(ev.startTime), "MMM d 'at' h:mm a")}
+                              </span>
+                              {ev.location && <span className="truncate">{ev.location}</span>}
+                            </div>
                           </div>
                         </div>
+                        <button
+                          className="w-7 h-7 rounded-lg flex items-center justify-center text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-colors flex-shrink-0"
+                          onClick={() => handleDelete(ev.id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
-                      <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 text-destructive/70 hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(ev.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </CardContent>
                   </Card>
                 ))}

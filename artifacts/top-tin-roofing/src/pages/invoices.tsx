@@ -84,15 +84,15 @@ export default function Invoices() {
 
   return (
     <AppShell>
-      <div className="flex flex-col space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground glow-text mb-1">Invoices</h1>
-            <p className="text-muted-foreground">Track payments and outstanding balances.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground glow-text">Invoices</h1>
+            <p className="text-sm text-muted-foreground">Track payments and outstanding balances.</p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30">
+              <Button className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 self-start sm:self-auto">
                 <Plus className="h-4 w-4 mr-2" /> New Invoice
               </Button>
             </DialogTrigger>
@@ -126,15 +126,15 @@ export default function Invoices() {
           </Dialog>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {[
             { label: "Collected Revenue", value: `$${totalRevenue.toLocaleString()}`, color: "text-secondary" },
             { label: "Outstanding Balance", value: `$${totalPending.toLocaleString()}`, color: "text-primary" },
           ].map(m => (
             <Card key={m.label} className="glass">
-              <CardContent className="p-5">
+              <CardContent className="p-4 sm:p-5">
                 <p className="text-xs text-muted-foreground mb-1">{m.label}</p>
-                <p className={`text-2xl font-bold ${m.color}`}>{m.value}</p>
+                <p className={`text-xl sm:text-2xl font-bold ${m.color}`}>{m.value}</p>
               </CardContent>
             </Card>
           ))}
@@ -143,7 +143,7 @@ export default function Invoices() {
         {isLoading ? (
           <div className="space-y-3">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-20 bg-white/5 rounded-xl" />)}</div>
         ) : !invoices?.length ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
             <Receipt className="h-12 w-12 text-muted-foreground mb-4 opacity-30" />
             <h3 className="text-lg font-medium text-muted-foreground mb-1">No invoices yet</h3>
             <Button onClick={() => setOpen(true)} className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 mt-3"><Plus className="h-4 w-4 mr-2" />Create Invoice</Button>
@@ -152,31 +152,45 @@ export default function Invoices() {
           <div className="space-y-3">
             {invoices.map(inv => (
               <Card key={inv.id} className="glass hover:border-primary/30 transition-colors group">
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <Receipt className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">{inv.invoiceNumber}</p>
-                        <p className="text-xs text-muted-foreground">{inv.customerName ?? `Customer #${inv.customerId}`}</p>
-                      </div>
+                <CardContent className="p-4">
+                  {/* Mobile: stacked layout */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Receipt className="h-4 w-4 text-primary" />
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium border", statusBadge(inv.status, inv.dueDate))}>
-                        {statusLabel(inv.status, inv.dueDate)}
-                      </span>
-                      <span className="text-xs text-muted-foreground">Due {format(new Date(inv.dueDate), "MMM d, yyyy")}</span>
-                      <span className="text-lg font-bold text-primary">${(inv.totalAmount ?? 0).toLocaleString()}</span>
-                      {inv.status !== "paid" && (
-                        <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 text-secondary/70 hover:text-secondary hover:bg-secondary/10" onClick={() => handleMarkPaid(inv.id)} title="Mark as paid">
-                          <CheckCircle2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                      <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 text-destructive/70 hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(inv.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-foreground text-sm truncate">{inv.invoiceNumber}</p>
+                          <p className="text-xs text-muted-foreground truncate">{inv.customerName ?? `Customer #${inv.customerId}`}</p>
+                        </div>
+                        <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium border flex-shrink-0", statusBadge(inv.status, inv.dueDate))}>
+                          {statusLabel(inv.status, inv.dueDate)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-muted-foreground">Due {format(new Date(inv.dueDate), "MMM d, yyyy")}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-base font-bold text-primary">${(inv.totalAmount ?? 0).toLocaleString()}</span>
+                          {inv.status !== "paid" && (
+                            <button
+                              className="w-7 h-7 rounded-lg flex items-center justify-center text-secondary/70 hover:text-secondary hover:bg-secondary/10 transition-colors"
+                              onClick={() => handleMarkPaid(inv.id)}
+                              title="Mark as paid"
+                            >
+                              <CheckCircle2 className="h-4 w-4" />
+                            </button>
+                          )}
+                          <button
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                            onClick={() => handleDelete(inv.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

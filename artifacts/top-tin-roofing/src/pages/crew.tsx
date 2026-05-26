@@ -3,7 +3,6 @@ import { AppShell } from "@/components/layout/shell";
 import {
   useGetCrewMembers,
   useCreateCrewMember,
-  useUpdateCrewMember,
   useDeleteCrewMember,
   getGetCrewMembersQueryKey,
 } from "@workspace/api-client-react";
@@ -68,15 +67,15 @@ export default function Crew() {
 
   return (
     <AppShell>
-      <div className="flex flex-col space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground glow-text mb-1">Crew</h1>
-            <p className="text-muted-foreground">Manage your roofing team.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground glow-text">Crew</h1>
+            <p className="text-sm text-muted-foreground">Manage your roofing team.</p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30">
+              <Button className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 self-start sm:self-auto">
                 <Plus className="h-4 w-4 mr-2" /> Add Member
               </Button>
             </DialogTrigger>
@@ -84,7 +83,7 @@ export default function Crew() {
               <DialogHeader>
                 <DialogTitle className="text-foreground">Add Crew Member</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
                     <Label className="text-xs text-muted-foreground">Full Name</Label>
@@ -132,47 +131,52 @@ export default function Crew() {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-48 bg-white/5 rounded-xl" />)}
           </div>
         ) : !crew?.length ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
             <HardHat className="h-12 w-12 text-muted-foreground mb-4 opacity-30" />
             <h3 className="text-lg font-medium text-muted-foreground mb-1">No crew members yet</h3>
             <Button onClick={() => setOpen(true)} className="bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 mt-3"><Plus className="h-4 w-4 mr-2" />Add Member</Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {crew.map(member => (
               <Card key={member.id} className="glass hover:border-primary/30 transition-colors group">
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-lg font-bold text-foreground">
+                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-base font-bold text-foreground flex-shrink-0">
                       {member.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", STATUS_STYLES[member.status] ?? "bg-muted text-muted-foreground")}>
                         {member.status.replace("_", " ")}
                       </span>
-                      <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 h-7 w-7 text-destructive/70 hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(member.id)}>
+                      <button
+                        className="w-7 h-7 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-all"
+                        onClick={() => handleDelete(member.id)}
+                      >
                         <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
+                      </button>
                     </div>
                   </div>
-                  <h3 className="font-semibold text-foreground mb-0.5">{member.name}</h3>
+                  <h3 className="font-semibold text-foreground mb-0.5 truncate">{member.name}</h3>
                   <p className="text-xs text-primary mb-3">{member.role}</p>
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Phone className="h-3 w-3" />{member.phone}
+                      <Phone className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">{member.phone}</span>
                     </div>
                     {member.email && (
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Mail className="h-3 w-3" />{member.email}
+                        <Mail className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{member.email}</span>
                       </div>
                     )}
                     {member.hourlyRate && (
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Star className="h-3 w-3 text-yellow-400" />${member.hourlyRate}/hr
+                        <Star className="h-3 w-3 text-yellow-400 flex-shrink-0" />${member.hourlyRate}/hr
                       </div>
                     )}
                   </div>
