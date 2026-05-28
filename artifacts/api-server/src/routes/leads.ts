@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { leadsTable, notesTable } from "@workspace/db";
+import { leadsTable, notesTable, notificationsTable } from "@workspace/db";
 import { eq, ilike, or } from "drizzle-orm";
 
 const router = Router();
@@ -46,6 +46,16 @@ router.post("/leads", async (req, res) => {
       assignedTo, notes,
       estimatedValue: estimatedValue?.toString(),
     }).returning();
+    // Fire-and-forget notification
+    db.insert(notificationsTable).values({
+      type: "new_lead",
+      title: "New Lead",
+      body: `${lead.name}${lead.address ? ` — ${lead.address}` : ""}${lead.estimatedValue ? ` · $${parseFloat(lead.estimatedValue).toLocaleString()}` : ""}`,
+      entityId: lead.id,
+      entityType: "lead",
+      read: false,
+    }).catch(() => {/* ignore */});
+
     res.status(201).json({
       ...lead,
       squareFootage: lead.squareFootage ? parseFloat(lead.squareFootage) : null,

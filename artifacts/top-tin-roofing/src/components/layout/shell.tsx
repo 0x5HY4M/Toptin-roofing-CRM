@@ -2,7 +2,7 @@ import { ReactNode, useState } from "react";
 import { Sidebar, MobileBottomNav, MobileDrawer } from "./sidebar";
 import { Search, Menu } from "lucide-react";
 import { useCommandPalette } from "@/components/CommandPalette";
-import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/NotificationBell";
 
 interface AppShellProps {
   children: ReactNode;
@@ -11,7 +11,7 @@ interface AppShellProps {
 function MobileHeader({ onMenuOpen }: { onMenuOpen: () => void }) {
   const { setOpen } = useCommandPalette();
   return (
-    <header className="sm:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center justify-between px-4 bg-background/90 backdrop-blur-xl border-b border-white/10">
+    <header className="sm:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center justify-between px-3 bg-background/90 backdrop-blur-xl border-b border-white/10">
       <button
         onClick={onMenuOpen}
         className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
@@ -24,13 +24,16 @@ function MobileHeader({ onMenuOpen }: { onMenuOpen: () => void }) {
         TOP TIN
       </span>
 
-      <button
-        onClick={() => setOpen(true)}
-        className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
-        aria-label="Search"
-      >
-        <Search className="h-4 w-4" />
-      </button>
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => setOpen(true)}
+          className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+          aria-label="Search"
+        >
+          <Search className="h-4 w-4" />
+        </button>
+        <NotificationBell />
+      </div>
     </header>
   );
 }

@@ -11,10 +11,12 @@ import eventsRouter from "./events";
 import materialsRouter from "./materials";
 import activityRouter from "./activity";
 import dashboardRouter from "./dashboard";
+import notificationsRouter from "./notifications";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use(notificationsRouter);
 router.use(leadsRouter);
 router.use(customersRouter);
 router.use(projectsRouter);

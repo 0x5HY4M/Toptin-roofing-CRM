@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useCommandPalette } from "@/components/CommandPalette";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -68,15 +69,19 @@ export function Sidebar() {
             TOP TIN
           </span>
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn("h-8 w-8 text-muted-foreground hover:text-primary transition-colors flex-shrink-0", collapsed && "mx-auto")}
-          onClick={() => setCollapsed(!collapsed)}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-        </Button>
+        <div className={cn("flex items-center gap-1", collapsed && "flex-col gap-0.5 mx-auto")}>
+          {!collapsed && <NotificationBell />}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
+            onClick={() => setCollapsed(!collapsed)}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </Button>
+          {collapsed && <NotificationBell />}
+        </div>
       </div>
 
       {/* Search button */}
