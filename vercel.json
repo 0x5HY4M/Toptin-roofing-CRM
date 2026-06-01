@@ -1,0 +1,6 @@
+{
+  "buildCommand": "pnpm build",
+  "outputDirectory": "artifacts/top-tin-roofing/dist",
+  "installCommand": "pnpm install",
+  "framework": "vite"
+}
