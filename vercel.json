@@ -1,6 +1,10 @@
 {
-  "buildCommand": "pnpm build",
+  "version": 2,
+  "buildCommand": "pnpm --filter @workspace/top-tin-roofing run build",
   "outputDirectory": "artifacts/top-tin-roofing/dist",
-  "installCommand": "pnpm install",
-  "framework": "vite"
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
