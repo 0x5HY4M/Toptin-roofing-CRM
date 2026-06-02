@@ -8,7 +8,7 @@ export default defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   
   const port = env.PORT ? Number(env.PORT) : 3000;
-  const basePath = env.BASE_PATH || "/";
+  const basePath = mode === "production" ? "/" : (env.BASE_PATH || "/");
 
   return {
     base: basePath,

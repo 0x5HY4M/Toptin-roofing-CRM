@@ -6,7 +6,7 @@ import NotFound from "@/pages/not-found";
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { shadcn } from "@clerk/themes";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Component, ReactNode } from "react";
 import { useLocation } from "wouter";
 import { CommandPaletteProvider } from "@/components/CommandPalette";
 
@@ -27,21 +27,27 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
 });
 
-const clerkPubKey = publishableKeyFromHost(
-  window.location.hostname,
-  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
-);
+function getClerkConfig() {
+  try {
+    const clerkPubKey = publishableKeyFromHost(
+      window.location.hostname,
+      import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+    );
+    const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+    return { clerkPubKey, clerkProxyUrl, valid: !!clerkPubKey };
+  } catch (e) {
+    console.error("Error initializing Clerk config:", e);
+    return { clerkPubKey: "", clerkProxyUrl: "", valid: false };
+  }
+}
 
-const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
-const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+const basePath = (import.meta.env.BASE_PATH || "").replace(/\/$/, "");
 
 function stripBase(path: string): string {
   return basePath && path.startsWith(basePath)
     ? path.slice(basePath.length) || "/"
     : path;
 }
-
-if (!clerkPubKey) throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 
 const clerkAppearance = {
   theme: shadcn,
@@ -132,18 +138,71 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
   );
 }
 
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+class ErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, ErrorBoundaryState> {
+  constructor(props: { children: ReactNode; fallback: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error("ErrorBoundary caught an error", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
+
 function AppRouter() {
   const [, setLocation] = useLocation();
+  const { clerkPubKey, clerkProxyUrl, valid } = getClerkConfig();
+
+  if (!valid) {
+    return (
+      <AuthPage>
+        <div className="text-center text-destructive">
+          <h2 className="text-lg font-semibold">Configuration Error</h2>
+          <p className="text-sm text-muted-foreground">
+            Missing or invalid VITE_CLERK_PUBLISHABLE_KEY
+          </p>
+        </div>
+      </AuthPage>
+    );
+  }
 
   return (
-    <ClerkProvider
-      publishableKey={clerkPubKey}
-      proxyUrl={clerkProxyUrl}
-      signInUrl={`${basePath}/sign-in`}
-      signUpUrl={`${basePath}/sign-up`}
-      routerPush={(to) => setLocation(stripBase(to))}
-      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
+    <ErrorBoundary
+      fallback={
+        <AuthPage>
+          <div className="text-center text-destructive">
+            <h2 className="text-lg font-semibold">Something went wrong</h2>
+            <p className="text-sm text-muted-foreground">
+              Please refresh the page to try again.
+            </p>
+          </div>
+        </AuthPage>
+      }
     >
+      <ClerkProvider
+        publishableKey={clerkPubKey}
+        proxyUrl={clerkProxyUrl}
+        signInUrl={`${basePath}/sign-in`}
+        signUpUrl={`${basePath}/sign-up`}
+        routerPush={(to) => setLocation(stripBase(to))}
+        routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
+      >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
         <CommandPaletteProvider>
@@ -170,6 +229,7 @@ function AppRouter() {
         </CommandPaletteProvider>
       </QueryClientProvider>
     </ClerkProvider>
+    </ErrorBoundary>
   );
 }
 
